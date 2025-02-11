@@ -1,0 +1,57 @@
+
+# Development Rules for Dale Carnegie Chatbot
+
+## General Guidelines
+- Do not generate any code without explicit confirmation
+- Ask for clarification if any requirement is unclear
+- Use latest stable versions of all dependencies
+- Follow TypeScript best practices
+- Use App Router architecture for Next.js
+- Implement error handling for all async operations
+- Always use proper typing
+
+## Development Order
+1. Initial setup only
+2. Ask before proceeding to next step
+3. Confirm file structure before creating files
+4. Verify dependency versions before installing
+
+## Code Style
+- Use shadcn/ui components
+- Follow Next.js 14 conventions
+- Use AI SDK for chat functionality
+- Implement streaming responses
+- Use proper TypeScript types
+
+## Setup Process
+1. Project Initialization
+   - Confirm Next.js version
+   - Verify dependency list
+   - Check TypeScript config
+
+2. Dependencies
+   - Confirm before installing each major dependency
+   - Use specific versions for stability
+   - Group related dependencies
+
+3. File Structure
+   - Confirm directory structure
+   - Create files one at a time
+   - Verify component hierarchy
+
+4. Components
+   - Build basic structure first
+   - Add functionality incrementally
+   - Confirm styling approach
+
+## Questions to Ask
+1. Version confirmations
+2. Directory structure verification
+3. Component implementation details
+4. API endpoint specifications
+5. Database connection details
+
+## Testing
+- Confirm test approach before implementation
+- Verify component functionality
+- Test database connections
