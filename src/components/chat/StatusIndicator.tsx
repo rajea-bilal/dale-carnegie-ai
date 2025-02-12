@@ -17,7 +17,7 @@ export function StatusIndicator({ status, isLoading }: StatusIndicatorProps) {
           <div className="w-2 h-2 rounded-full bg-muted-foreground/50 animate-bounce" style={{ animationDelay: '300ms' }} />
         </div>
       )}
-      {status && <span>{status}</span>}
+      <span>{status || (isLoading ? 'AI is thinking...' : '')}</span>
     </div>
   )
 } 

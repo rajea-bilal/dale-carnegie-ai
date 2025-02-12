@@ -9,8 +9,15 @@ import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Trash2 } from 'lucide-react'
 
+const WELCOME_MESSAGE: Message = {
+  id: 'welcome',
+  role: 'assistant',
+  content: "Hello friend! I'm Dale Carnegie, and I'm delighted to meet you. My passion is helping people like you build wonderful relationships and achieve their dreams through simple, heartfelt principles. What's on your mind? Let's talk"
+}
+
 export function ChatContainer() {
   const [statusMessage, setStatusMessage] = useState<string>()
+  const [hasShownWelcome, setHasShownWelcome] = useState(false)
 
   const {
     messages,
@@ -23,17 +30,22 @@ export function ChatContainer() {
   } = useChat({
     api: '/api/chat',
     onResponse: (response: Response) => {
-      // Handle streaming response start
       if (response.ok) {
         console.log('Response started')
       }
     },
     onFinish: (message: Message) => {
-      // Clear status when response is complete
       setStatusMessage(undefined)
       console.log('Response finished', message)
     },
   })
+
+  // Add welcome message when component first mounts
+  useEffect(() => {
+    if (messages.length === 0) {
+      setMessages([WELCOME_MESSAGE])
+    }
+  }, []) // Empty dependency array - only runs once on mount
 
   // Handle status messages from the stream
   useEffect(() => {
@@ -48,14 +60,9 @@ export function ChatContainer() {
     setStatusMessage(undefined)
   }
 
-  const allMessages = [
-    ...messages,
-    ...(statusMessage ? [{ role: 'system', content: '', status: statusMessage } as Message] : [])
-  ]
-
   return (
-    <Card className="w-full max-w-2xl mx-auto h-[600px] flex flex-col">
-      <div className="p-4 border-b flex items-center justify-between">
+    <Card className="w-full max-w-2xl mx-auto h-[600px] flex flex-col bg-background/80 backdrop-blur-sm border-background/20 shadow-xl">
+      <div className="p-4 border-b border-border/50 flex items-center justify-between">
         <h2 className="text-lg font-semibold">Dale Carnegie AI</h2>
         {messages.length > 0 && (
           <Button
@@ -69,8 +76,13 @@ export function ChatContainer() {
           </Button>
         )}
       </div>
-      <div className="flex-1 overflow-hidden">
-        <MessageList messages={allMessages} />
+      <div className="flex-1 overflow-hidden relative">
+        <MessageList messages={messages} />
+        {statusMessage && (
+          <div className="absolute bottom-0 left-0 right-0 p-4 text-sm text-muted-foreground italic bg-background/80 backdrop-blur-sm">
+            {statusMessage}
+          </div>
+        )}
       </div>
       <div className="p-4 border-t">
         <ChatInput
