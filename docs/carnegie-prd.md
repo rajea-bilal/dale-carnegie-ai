@@ -271,3 +271,84 @@ try {
 - Check response times
 - Verify streaming functionality
 - Validate citations
+
+### 11. Voice Features
+
+#### 11.1 What We're Building
+We're adding a voice feature that lets users hear Dale Carnegie's AI voice read out the chatbot's responses. Here's what it will look like:
+
+Each message will have a speaker icon
+Users can click the icon to hear the response
+The icon will show different states:
+
+Normal (ready to play)
+Loading (creating voice)
+Playing (currently speaking)
+Error (if something goes wrong)
+
+
+
+#### 11.2 How It Works
+
+Basic Flow:
+
+
+User clicks speaker icon
+System sends message text to ElevenLabs
+ElevenLabs converts text to Dale's voice
+Audio plays through user's device
+
+
+Behind the Scenes:
+
+
+Store audio files temporarily to avoid regenerating the same responses
+Keep track of which responses have audio
+Remember user preferences (like if they prefer voice on/off)
+Handle errors gracefully
+
+#### 11.3 Technical Setup Needed
+
+ElevenLabs Integration:
+
+
+API key
+Dale Carnegie voice ID
+Voice settings (how much it sounds like Dale)
+
+
+New Environment Variables:
+ELEVENLABS_API_KEY=your_api_key_here
+ELEVENLABS_VOICE_ID=dale_carnegie_voice_id
+
+#### 11.4 Building in Phases
+##### Phase 1: Basic Setup
+
+Add speaker icons to messages
+Create simple play/pause controls
+Show loading state while creating voice
+Save user preferences
+
+##### Phase 2: Making It Better
+
+Save commonly used responses to avoid regenerating them
+Handle long responses better
+Manage multiple audio requests
+Track API usage to stay within limits
+
+##### 11.5 Testing Checklist
+We need to test:
+
+Audio generation works
+Play/pause works
+Loading states show correctly
+Errors are handled nicely
+Saved responses work
+Memory usage is efficient
+
+#### 11.6 Performance Goals
+
+Audio should start generating within 3 seconds
+Playback should start within half a second
+Saved responses should work 80% of the time
+Errors should happen less than 1% of the time
