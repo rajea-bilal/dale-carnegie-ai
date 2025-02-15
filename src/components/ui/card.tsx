@@ -106,7 +106,7 @@ const AnimatedCard = React.forwardRef<
     },
     Rotate: {
       initial: {
-        rotate: -60,
+        rotate: -48,
         scale: 0.4,
         opacity: 0,
       },
@@ -117,7 +117,7 @@ const AnimatedCard = React.forwardRef<
         transition: {
           type: "spring",
           stiffness: 150,
-          damping: 20,
+          damping: 22,
         },
       },
       exit: {

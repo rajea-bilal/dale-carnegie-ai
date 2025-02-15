@@ -18,14 +18,15 @@ export function ChatList({ chats }: ChatListProps) {
   return (
     <ScrollArea className="flex-1">
       <div className="p-4">
-        <span>Chats</span>
-        <hr  className="mb-4" />
-        {chats.map((chat) => (
+        <span className="text-gray-900 font-medium text-sm">Chats</span>
+        <div  className="mb-1" />
+        {chats.map((chat, index) => (
           <ChatListItem
             key={chat.id}
             {...chat}
             isActive={activeChat === chat.id}
             onClick={() => selectChat(chat.id)}
+            index={index}
           />
         ))}
       </div>

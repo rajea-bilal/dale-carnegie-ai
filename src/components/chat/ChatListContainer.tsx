@@ -24,9 +24,9 @@ export function ChatListContainer() {
 
   return (
     <AnimatedCard className="w-[350px] flex flex-col bg-background/80 backdrop-blur-sm border-background/20 shadow-xl">
-      {/* <ChatListHeader />
+      <ChatListHeader />
       <ChatList chats={filteredChats} />
-      <ChatListFooter /> */}
+      <ChatListFooter />
     </AnimatedCard>
   );
 }
