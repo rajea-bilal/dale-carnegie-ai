@@ -1,12 +1,13 @@
 "use client";
 import { useRef, useEffect } from 'react';
+import { useWallpaper } from '@/context/WallpaperContext';
 
 interface WallpaperProps {
-  isPlaying?: boolean;
 }
 
-export const Wallpaper = ({ isPlaying }: WallpaperProps) => {
+export const Wallpaper = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const { isPlaying } = useWallpaper();
 
   useEffect(() => {
     if (videoRef.current) {

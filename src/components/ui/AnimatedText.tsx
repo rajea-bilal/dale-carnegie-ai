@@ -1,6 +1,6 @@
 "use client";
 import { motion, Variants } from "motion/react";
-import { useEffect, useState } from "react";
+import { useAnimationDelay } from "@/hooks/useAnimationDelay";
 
 type AnimationVariant = "letter" | "word";
 
@@ -15,15 +15,7 @@ const AnimatedText = ({
     variant?: AnimationVariant;
     delay?: number;
 }) => {
-    const [isVisible, setIsVisible] = useState(false);
-
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            setIsVisible(true);
-        }, delay);
-
-        return () => clearTimeout(timer);
-    }, [delay]);
+    const isVisible = useAnimationDelay(delay);
 
     // Animation configuration for each element (letter or word)
     const elementVariants: Variants = {

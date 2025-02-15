@@ -8,7 +8,7 @@ const NavigationBar = () => {
     <div
       className={cn(
         "flex",
-        "mt-auto mb-4",
+        "mt-8 mb-4",
         "bg-gray-200 rounded-lg",
         "border border-gray-300"
       )}

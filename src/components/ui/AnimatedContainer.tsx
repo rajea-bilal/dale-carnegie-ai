@@ -1,6 +1,7 @@
 "use client";
 import { motion, Variants } from "motion/react";
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode } from "react";
+import { useAnimationDelay } from "@/hooks/useAnimationDelay";
 
 const AnimatedContainer = ({
     children,
@@ -11,15 +12,7 @@ const AnimatedContainer = ({
     className?: string;
     delay?: number;
 }) => {
-    const [isVisible, setIsVisible] = useState(false);
-
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            setIsVisible(true);
-        }, delay);
-
-        return () => clearTimeout(timer);
-    }, [delay]);
+    const isVisible = useAnimationDelay(delay);
 
     const elementVariants: Variants = {
         hidden: { 
