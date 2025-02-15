@@ -1,7 +1,8 @@
-"use client";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { ChatListItem } from "./ChatListItem";
+import React from "react";
 import { useChatContext } from "@/contexts/ChatContext";
+import ChatListHeader from "./ChatListHeader";
+import { ChatListItem } from "./ChatListItem";
+import { ChatListFooter } from "./ChatListFooter";
 
 interface ChatListProps {
   chats: Array<{
@@ -12,24 +13,26 @@ interface ChatListProps {
   }>;
 }
 
-export function ChatList({ chats }: ChatListProps) {
-  const { activeChat, selectChat } = useChatContext();
+const ChatList: React.FC<ChatListProps> = () => {
+  const { chats, currentChat, setCurrentChat, deleteChat } = useChatContext();
 
   return (
-    <ScrollArea className="flex-1">
-      <div className="p-4">
-        <span className="text-gray-900 font-medium text-sm">Chats</span>
-        <div  className="mb-1" />
+    <div className="flex flex-col h-full">
+      <div className="flex-1 overflow-y-auto p-3">
+        <h2 className="text-sm font-semibold mb-1.5">Chats</h2>
         {chats.map((chat, index) => (
           <ChatListItem
             key={chat.id}
-            {...chat}
-            isActive={activeChat === chat.id}
-            onClick={() => selectChat(chat.id)}
+            chat={chat}
+            isActive={currentChat?.id === chat.id}
+            onClick={() => setCurrentChat(chat)}
+            onDelete={() => deleteChat(chat.id)}
             index={index}
           />
         ))}
       </div>
-    </ScrollArea>
+    </div>
   );
-}
+};
+
+export default ChatList;

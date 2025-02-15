@@ -1,28 +1,33 @@
 "use client";
-import { AnimatedCard, Card } from "@/components/ui/card";
+import React from 'react';
+import { ChatData } from '../../utils/Storage';
+import { AnimatedCard } from "@/components/ui/card";
+import { TrashIcon } from 'lucide-react';
 
 interface ChatListItemProps {
-  id: string;
-  title: string;
-  lastMessage?: string;
-  timestamp?: string;
-  isActive?: boolean;
-  onClick?: () => void;
+  chat: ChatData;
+  isActive: boolean;
+  onClick: () => void;
+  onDelete: () => void;
   index: number;
 }
 
 export function ChatListItem({
-  title,
-  lastMessage,
-  timestamp,
+  chat,
   isActive,
   onClick,
+  onDelete,
   index,
 }: ChatListItemProps) {
+  const handleDelete = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onDelete();
+  };
+
   return (
     <AnimatedCard
       variant="Rotate"
-      delay={(index * 220) - 100}
+      delay={(index * 150) - (50 * index) + 300}
       className={`p-3 mb-2 cursor-pointer hover:bg-background/90 transition-colors
         ${
           isActive
@@ -32,17 +37,18 @@ export function ChatListItem({
       onClick={onClick}
     >
       <div className="flex justify-between items-start">
-        <div>
-          <h3 className="font-medium text-sm">{title}</h3>
-          {lastMessage && (
-            <p className="text-xs text-muted-foreground truncate">
-              {lastMessage}
-            </p>
-          )}
+        <div className="flex-1">
+          <h3 className="font-medium text-sm">{chat.title}</h3>
+          <p className="text-xs text-muted-foreground">
+            {new Date(chat.updatedAt).toLocaleString()}
+          </p>
         </div>
-        {timestamp && (
-          <span className="text-[10px] text-muted-foreground">{timestamp}</span>
-        )}
+        <button
+          onClick={handleDelete}
+          className="p-2 hover:bg-gray-200 rounded-full"
+        >
+          <TrashIcon className="h-5 w-5 text-gray-500" />
+        </button>
       </div>
     </AnimatedCard>
   );
