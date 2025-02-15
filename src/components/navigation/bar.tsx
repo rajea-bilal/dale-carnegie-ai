@@ -3,24 +3,41 @@ import { cn } from "@/lib/utils";
 import { Button } from "../ui/button";
 import { Home, MessagesSquare } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { motion } from "motion/react";
+import { useWallpaper } from "@/contexts/WallpaperContext";
+import { useNavigateWithDelay } from "@/hooks/useNavigateWithDelay";
+import { useState } from "react";
 
 const NavigationBar = () => {
+  const [isChatClicked, setIsChatClicked] = useState(false);
   const pathname = usePathname();
+  const { wasPlayed } = useWallpaper();
+  const { handleNavigate } = useNavigateWithDelay({
+    path: "/chat",
+    shouldNavigate: () => !pathname.includes("/chat") && !wasPlayed,
+    onReset: () => setIsChatClicked(false),
+  });
 
-  const isHomeActive = pathname === "/";
-  const isChatActive = pathname === "/chat";
+  const isHomeActive = !isChatClicked && pathname === "/";
+  const isChatActive = isChatClicked || pathname === "/chat";
 
-  const linkStyles = "hover:bg-white/20 hover:text-white [&.active:hover]:bg-black";
+  const handleChatClick = (e: React.MouseEvent) => {
+    handleNavigate(e);
+    setIsChatClicked(true);
+  };
+
+  const linkStyles =
+    "hover:bg-white/20 hover:text-white [&.active:hover]:bg-black";
 
   return (
     <div
       className={cn(
         "flex z-20 mx-auto",
-        "mt-8 mb-4 relative",
+        "mt-7 mb-6 relative",
         "bg-gray-200 rounded-lg",
-        "border border-gray-300"
+        "border border-gray-300",
+        isChatClicked && "pointer-events-none"
       )}
     >
       <Cursor activeIndex={isHomeActive ? 0 : 1} />
@@ -31,7 +48,11 @@ const NavigationBar = () => {
           </Link>
         </Button>
         <Button asChild variant="ghost">
-          <Link href="/chat" className={cn(linkStyles, isChatActive && "active")}>
+          <Link
+            href="/chat"
+            onClick={handleChatClick}
+            className={cn(linkStyles, isChatActive && "active")}
+          >
             <MessagesSquare />
           </Link>
         </Button>

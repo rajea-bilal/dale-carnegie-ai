@@ -6,7 +6,7 @@ import { ChatProvider } from "@/contexts/ChatContext";
 export default function ChatPage() {
   return (
     <main className="relative flex-grow min-h-0">
-      <div className="relative z-20 flex flex-col items-center justify-between mx-auto max-w-6xl py-10 h-full">
+      <div className="relative z-20 flex flex-col items-center justify-between mx-auto max-w-6xl pt-8 h-full">
         <ChatProvider>
           <div className="w-full grid grid-cols-[350px,1fr] flex-grow min-h-0 gap-7">
             <ChatListContainer />
