@@ -1,6 +1,6 @@
 "use client";
 import { useRef, useEffect } from 'react';
-import { useWallpaper } from '@/context/WallpaperContext';
+import { useWallpaper } from '@/contexts/WallpaperContext';
 
 interface WallpaperProps {
 }

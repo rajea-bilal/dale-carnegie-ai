@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { GeistSans } from "geist/font/sans";
 import Wallpaper from "@/components/ui/Wallpaper";
-import { WallpaperProvider } from "@/context/WallpaperContext";
+import { WallpaperProvider } from "@/contexts/WallpaperContext";
 
 export const metadata: Metadata = {
   title: "Dale Carnegie AI",
