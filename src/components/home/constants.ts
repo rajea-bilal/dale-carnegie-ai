@@ -1,0 +1,4 @@
+export const ANIMATION_DELAYS = {
+    SECOND_ANIMATION_START: 1 * 1000, 
+    THIRD_ANIMATION_START: 1.5 * 1000,
+} as const;

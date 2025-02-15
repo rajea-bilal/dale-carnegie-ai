@@ -1,11 +1,6 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
-
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-sans",
-});
+import { GeistSans } from 'geist/font/sans';
 
 export const metadata: Metadata = {
   title: "Dale Carnegie AI",
@@ -19,7 +14,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning={true}>
-      <body className={`${inter.variable} font-sans antialiased`}>
+      <body className={`${GeistSans.className} antialiased`}>
         {children}
       </body>
     </html>
