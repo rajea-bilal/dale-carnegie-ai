@@ -19,7 +19,7 @@ const ChatList: React.FC<ChatListProps> = () => {
   return (
     <div className="flex flex-col h-full">
       <div className="flex-1 overflow-y-auto p-3">
-        <h2 className="text-sm font-semibold mb-1.5">Chats</h2>
+        <h2 className="text-xs font-semibold mb-1.5 opacity-80">Chats</h2>
         {chats.map((chat, index) => (
           <ChatListItem
             key={chat.id}

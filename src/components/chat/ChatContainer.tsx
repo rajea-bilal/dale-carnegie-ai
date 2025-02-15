@@ -6,6 +6,7 @@ import { ChatInput } from './ChatInput'
 import { Message } from '@/types'
 import { useEffect, useState } from 'react'
 import { ChatCard } from './ChatCard'
+import { useChatContext } from '@/contexts/ChatContext'
 
 const WELCOME_MESSAGE: Message = {
   id: 'welcome',
@@ -15,7 +16,7 @@ const WELCOME_MESSAGE: Message = {
 
 export function ChatContainer() {
   const [statusMessage, setStatusMessage] = useState<string>()
-  const [hasShownWelcome, setHasShownWelcome] = useState(false)
+  const { currentChat, updateChat } = useChatContext()
 
   const {
     messages,
@@ -35,15 +36,30 @@ export function ChatContainer() {
     onFinish: (message: Message) => {
       setStatusMessage(undefined)
       console.log('Response finished', message)
+      // Update the current chat in context when messages change
+      if (currentChat) {
+        updateChat(currentChat.id, {
+          messages: [...messages, message],
+          updatedAt: new Date().toISOString()
+        })
+      }
     },
   })
 
-  // Add welcome message when component first mounts
-  useEffect(() => {
-    if (messages.length === 0) {
-      setMessages([WELCOME_MESSAGE])
-    }
-  }, []) // Empty dependency array - only runs once on mount
+  // // Initialize messages from current chat when it changes
+  // useEffect(() => {
+  //   if (currentChat?.messages && currentChat.messages.length > 0) {
+  //     setMessages(currentChat.messages)
+  //   } else {
+  //     // If this is a new chat, update it with the welcome message
+  //     if (currentChat && currentChat.messages.length === 0) {
+  //       updateChat(currentChat.id, {
+  //         messages: [WELCOME_MESSAGE],
+  //         updatedAt: new Date().toISOString()
+  //       })
+  //     }
+  //   }
+  // }, [currentChat])
 
   // Handle status messages from the stream
   useEffect(() => {
@@ -60,13 +76,8 @@ export function ChatContainer() {
 
   return (
     <ChatCard messages={messages} onClearChat={handleClearChat}>
-      {/* <div className="flex-1 overflow-hidden relative">
+      <div className="flex-1 overflow-hidden relative">
         <MessageList messages={messages} />
-        {statusMessage && (
-          <div className="absolute bottom-0 left-0 right-0 p-4 text-sm text-muted-foreground italic bg-background/80 backdrop-blur-sm">
-            {statusMessage}
-          </div>
-        )}
       </div>
       <div className="p-4 border-t">
         <ChatInput
@@ -75,7 +86,7 @@ export function ChatContainer() {
           handleSubmit={handleSubmit}
           isLoading={isLoading}
         />
-      </div> */}
+      </div>
     </ChatCard>
   )
-} 
+}
