@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { GeistSans } from 'geist/font/sans';
+import { GeistSans } from "geist/font/sans";
+import Wallpaper from "@/components/ui/Wallpaper";
 
 export const metadata: Metadata = {
   title: "Dale Carnegie AI",
@@ -15,6 +16,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning={true}>
       <body className={`${GeistSans.className} antialiased`}>
+        <Wallpaper />
         {children}
       </body>
     </html>
