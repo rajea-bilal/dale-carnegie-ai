@@ -2,13 +2,14 @@ import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { ChatInputProps } from '@/types'
 import { ArrowRight, Send, SendHorizonal } from 'lucide-react'
+import { useRef } from 'react';
 
 export function ChatInput({
   input,
   handleInputChange,
   handleSubmit,
   isLoading
-}: ChatInputProps) {
+}: ChatInputProps) {  
   return (
     <form onSubmit={handleSubmit} className="flex items-end gap-2">
       <Textarea
@@ -26,7 +27,6 @@ export function ChatInput({
         }}
         placeholder="Ask about Dale Carnegie's principles..."
         className="min-h-[60px] resize-none"
-        disabled={isLoading}
         autoFocus
       />
       <Button 
