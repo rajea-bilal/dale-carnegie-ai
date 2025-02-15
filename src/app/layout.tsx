@@ -3,6 +3,7 @@ import "./globals.css";
 import { GeistSans } from "geist/font/sans";
 import Wallpaper from "@/components/ui/Wallpaper";
 import { WallpaperProvider } from "@/contexts/WallpaperContext";
+import NavigationBar from "@/components/navigation/bar";
 
 export const metadata: Metadata = {
   title: "Dale Carnegie AI",
@@ -19,7 +20,10 @@ export default function RootLayout({
       <body className={`${GeistSans.className} antialiased`}>
         <WallpaperProvider>
           <Wallpaper />
-          {children}
+          <div className="flex flex-col h-screen">
+            {children}
+            <NavigationBar />
+          </div>
         </WallpaperProvider>
       </body>
     </html>
