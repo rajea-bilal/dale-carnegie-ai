@@ -7,6 +7,7 @@ import { Message } from "@/types";
 import { useEffect, useState } from "react";
 import { ChatCard } from "./ChatCard";
 import { useChatContext } from "@/contexts/ChatContext";
+import { useUser, useClerk } from "@clerk/nextjs";
 
 const WELCOME_MESSAGE: Message = {
   id: "welcome",
@@ -16,14 +17,17 @@ const WELCOME_MESSAGE: Message = {
 };
 
 export function ChatContainer() {
+  const { user } = useUser();
   const [statusMessage, setStatusMessage] = useState<string>();
   const { currentChat, updateChat } = useChatContext();
+  const { openSignUp } = useClerk();
+
 
   const {
     messages,
     input,
     handleInputChange,
-    handleSubmit,
+    handleSubmit: originalHandleSubmit,
     isLoading,
     reload,
     setMessages,
@@ -73,6 +77,15 @@ export function ChatContainer() {
   const handleClearChat = () => {
     setMessages([]);
     setStatusMessage(undefined);
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user) {
+      openSignUp();
+      return;
+    }
+    originalHandleSubmit(e);
   };
 
   return (
