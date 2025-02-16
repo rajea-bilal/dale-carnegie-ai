@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { ChatCard } from "./ChatCard";
 import { useChatContext } from "@/contexts/ChatContext";
 import { useUser, useClerk } from "@clerk/nextjs";
+import toast from 'react-hot-toast';
 
 const WELCOME_MESSAGE: Message = {
   id: "welcome",
@@ -37,6 +38,20 @@ export function ChatContainer() {
       if (response.ok) {
         console.log("Response started");
       }
+    },
+    onError: (error: Error) => {
+      if (error.message.includes('Daily Token Limit Reached')) {
+        toast.error('Daily message limit reached. Please try again tomorrow.', {
+          duration: 4000,
+          position: 'top-center',
+        });
+      } else {
+        toast.error('Something went wrong. Please try again.', {
+          duration: 4000,
+          position: 'top-center',
+        });
+      }
+      setStatusMessage(undefined);
     },
     onFinish: (message: Message) => {
       setStatusMessage(undefined);
@@ -69,7 +84,7 @@ export function ChatContainer() {
   // Handle status messages from the stream
   useEffect(() => {
     const lastMessage = messages[messages.length - 1];
-    if (lastMessage?.role === "assistant" && !lastMessage.content) {
+    if ((lastMessage?.role === "assistant" && !lastMessage.content) || (isLoading && !lastMessage?.content)) {
       setStatusMessage("AI is thinking...");
     }
   }, [messages]);

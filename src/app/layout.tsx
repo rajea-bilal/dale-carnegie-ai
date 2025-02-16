@@ -5,6 +5,7 @@ import Wallpaper from "@/components/ui/Wallpaper";
 import { WallpaperProvider } from "@/contexts/WallpaperContext";
 import NavigationBar from "@/components/navigation/bar";
 import { ClerkProvider } from "@clerk/nextjs";
+import { Toaster } from 'react-hot-toast';
 
 export const metadata: Metadata = {
   title: "Dale Carnegie AI",
@@ -27,6 +28,7 @@ export default function RootLayout({
               <NavigationBar />
             </div>
           </WallpaperProvider>
+          <Toaster />
         </body>
       </html>
     </ClerkProvider>
