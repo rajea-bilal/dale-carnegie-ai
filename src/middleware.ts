@@ -47,7 +47,7 @@ export default clerkMiddleware(async (auth: ClerkMiddlewareAuth, request: NextRe
                 { message: 'Daily Token Limit Reached' },
                 { status: 429 } // Added this status 429, because it will throw an error and I can catch it in the onError method of useChat
             );
-        
+
         // adding extra infor to response headers
         // let client know how many request requests are allowed
         // how amny requests are left
