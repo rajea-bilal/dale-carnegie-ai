@@ -8,18 +8,19 @@ export async function POST(req: Request) {
     // 1. Get the messages from the request
     const { messages } = await req.json()
     const lastMessage = messages[messages.length - 1]
-    
+
     // Return streaming response immediately
     return createDataStreamResponse({
       execute: async (dataStream) => {
         try {
           // Special case handling
           const isIdentityQuestion = lastMessage.content.toLowerCase().match(/who are you|what are you|tell me about yourself/)
-          
+
           if (isIdentityQuestion) {
             // Skip vector search for identity questions
             const result = await streamText({
-              model: openai('gpt-4-turbo'),
+              // model: openai('gpt-4-turbo'),
+              model: openai('gpt-4o-mini'),
               messages: [
                 {
                   role: 'system',
@@ -50,7 +51,7 @@ export async function POST(req: Request) {
             vector: embedding,
             topK: 5,
             includeMetadata: true,
-           
+
           }).catch(() => {
             throw new Error('Failed to search knowledge base. Please try again.')
           })
@@ -78,12 +79,12 @@ export async function POST(req: Request) {
           console.log('6. Final context being sent to OpenAI:', context)
 
           // Write citations as message annotation
-          dataStream.writeMessageAnnotation({ 
+          dataStream.writeMessageAnnotation({
             citations,
             // Add additional metadata to help with debugging
             citationsFound: citations.length > 0,
             contextLength: context.length,
-           
+
           })
 
           const systemPrompt = `
@@ -139,7 +140,8 @@ export async function POST(req: Request) {
           try {
             // Stream the text response
             const result = streamText({
-              model: openai('gpt-4-turbo'),
+              model: openai('gpt-4o-mini'),
+              // model: openai('gpt-4-turbo'),
               messages: [
                 {
                   role: 'system',

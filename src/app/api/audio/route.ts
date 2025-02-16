@@ -16,7 +16,7 @@ export async function POST(req: Request) {
 
   try {
     console.log('🎙️ Audio generation request received')
-    
+
     const { text } = await req.json()
     console.log('Text to convert:', text)
 
@@ -31,7 +31,8 @@ export async function POST(req: Request) {
     const audioStream = await client.textToSpeech.convert(ELEVENLABS_VOICE_ID, {
       output_format: 'mp3_44100_128',
       text,
-      model_id: 'eleven_multilingual_v2',
+      model_id: 'eleven_flash_v2_5',
+      // model_id: 'eleven_multilingual_v2',
       voice_settings: {
         stability: 0.7,
         similarity_boost: 0.8,
@@ -55,7 +56,7 @@ export async function POST(req: Request) {
     })
   } catch (error: any) {
     console.error('💥 Unexpected error in audio generation:', error)
-    
+
     // More specific error handling
     if (error.response?.status === 401) {
       return new NextResponse('Authentication failed', { status: 401 })
@@ -63,7 +64,7 @@ export async function POST(req: Request) {
     if (error.response?.status === 429) {
       return new NextResponse('Rate limit exceeded', { status: 429 })
     }
-    
+
     return new NextResponse(
       'Error generating audio',
       { status: 500 }
