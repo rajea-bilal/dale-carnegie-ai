@@ -80,9 +80,10 @@ const AnimatedCard = React.forwardRef<
   React.HTMLAttributes<HTMLDivElement> & {
     variant?: "SlideDown" | "Rotate";
     delay?: number;
+    animationDisabled?: boolean;
   }
->(({ className, variant = "SlideDown", delay = 0, ...props }, ref) => {
-  const enabled = useAnimationDelay(delay);
+>(({ className, variant = "SlideDown", delay = 0, animationDisabled = false, ...props }, ref) => {
+  const enabled = useAnimationDelay(delay) && !animationDisabled;
 
   const variants = {
     SlideDown: {
@@ -141,9 +142,9 @@ const AnimatedCard = React.forwardRef<
         variant === "SlideDown" && "overflow-hidden",
         className
       )}
-      initial="initial"
-      animate={enabled ? "animate" : "initial"}
-      exit="exit"
+      initial={animationDisabled ? "animate" : "initial"}
+      animate="animate"
+      exit={animationDisabled ? "animate" : "exit"}
       variants={variants[variant]}
       {...props}
     />

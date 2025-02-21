@@ -1,6 +1,6 @@
 "use client";
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
-import { Storage, ChatData } from '../utils/Storage';
+import { ChatStorage, ChatData } from '../utils/Storage';
 
 interface ChatContextType {
   chats: ChatData[];
@@ -11,6 +11,7 @@ interface ChatContextType {
   deleteChat: (id: string) => void;
   searchQuery: string;
   setSearchQuery: (query: string) => void;
+  updateChatMessages: (id: string, messages: any[]) => void;
 }
 
 const ChatContext = createContext<ChatContextType | undefined>(undefined);
@@ -22,8 +23,9 @@ export function ChatProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     // Initialize storage and load chats
-    Storage.initialize();
-    const loadedChats = Storage.getAllChats();
+    ChatStorage.initialize();
+    const loadedChats = ChatStorage.getAllChats();
+    console.log(loadedChats)
     setChats(loadedChats);
     setCurrentChat(loadedChats[0]);
   }, []);
@@ -37,22 +39,26 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       createdAt: now,
       updatedAt: now
     };
-    Storage.createChat(newChat);
-    setChats(Storage.getAllChats());
+    ChatStorage.createChat(newChat);
+    setChats(ChatStorage.getAllChats());
     setCurrentChat(newChat);
   };
 
   const updateChat = (id: string, updates: Partial<ChatData>) => {
-    Storage.updateChat(id, updates);
-    setChats(Storage.getAllChats());
+    ChatStorage.updateChat(id, updates);
+    setChats(ChatStorage.getAllChats());
     if (currentChat?.id === id) {
       setCurrentChat({ ...currentChat, ...updates });
     }
   };
 
+  const updateChatMessages = (id: string, messages: any[]) => {
+    ChatStorage.updateChat(id, { messages });
+  };
+
   const deleteChat = (id: string) => {
-    Storage.deleteChat(id);
-    const updatedChats = Storage.getAllChats();
+    ChatStorage.deleteChat(id);
+    const updatedChats = ChatStorage.getAllChats();
     setChats(updatedChats);
     if (currentChat?.id === id) {
       setCurrentChat(updatedChats[0]);
@@ -70,6 +76,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         deleteChat,
         searchQuery,
         setSearchQuery,
+        updateChatMessages,
       }}
     >
       {children}

@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@ai-sdk/openai": "^1.1.9",
-    "@clerk/nextjs": "^5.0.12",
+    "@clerk/nextjs": "^5.7.5",
     "@pinecone-database/pinecone": "^4.1.0",
     "@radix-ui/react-scroll-area": "^1.2.3",
     "@radix-ui/react-slot": "^1.1.2",

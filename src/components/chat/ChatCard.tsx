@@ -11,13 +11,14 @@ interface ChatCardProps {
 }
 
 export function ChatCard({ messages, onClearChat, children }: ChatCardProps) {
-  const { currentChat } = useChatContext();
+  const { currentChat, searchQuery } = useChatContext();
 
   return (
     <AnimatedCard
       delay={500}
       variant="Rotate"
       className="w-full flex flex-col bg-background/80 backdrop-blur-sm border-background/20 shadow-xl"
+      animationDisabled={!!searchQuery}
     >
       <div className="p-4 border-b border-border/50 flex items-center justify-between">
         <h2 className="text-lg font-semibold">{currentChat?.title}</h2>
