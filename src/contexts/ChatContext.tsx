@@ -25,7 +25,6 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     // Initialize storage and load chats
     ChatStorage.initialize();
     const loadedChats = ChatStorage.getAllChats();
-    console.log(loadedChats)
     setChats(loadedChats);
     setCurrentChat(loadedChats[0]);
   }, []);

@@ -25,7 +25,7 @@ export function MessageList({ messages }: MessageListProps) {
   }
 
   return (
-    <ScrollArea className="h-full p-4 overflow-auto max-h-[350px]">
+    <ScrollArea className="h-full p-4 pb-0 overflow-auto">
       <div className="space-y-4">
         {messages.map((message) => (
           <MessageBubble

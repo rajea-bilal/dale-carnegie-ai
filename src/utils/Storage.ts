@@ -41,11 +41,8 @@ export class ChatStorage {
 
   static updateChat(id: string, updates: Partial<ChatData>): void {
     const chats = this.getAllChats();
-    console.log(`chats`, chats)
     const index = chats.findIndex(chat => chat.id === id);
-    console.log(`index`, index)
     if (index !== -1) {
-      console.log(`found chat`, chats[index])
       chats[index] = {
         ...chats[index],
         ...updates,

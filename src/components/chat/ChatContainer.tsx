@@ -90,8 +90,12 @@ export function ChatContainer() {
   };
 
   return (
-    <ChatCard messages={messages} onClearChat={handleClearChat}>
-      <div className="flex flex-col flex-grow min-h-0 overflow-hidden">
+    <ChatCard
+      className="flex flex-col flex-grow min-h-0 overflow-hidden"
+      messages={messages}
+      onClearChat={handleClearChat}
+    >
+      <div className="flex flex-col flex-grow min-h-0">
         <MessageList messages={messages} />
       </div>
       <div className="p-4 border-t">

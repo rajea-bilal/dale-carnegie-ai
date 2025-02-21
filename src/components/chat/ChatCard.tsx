@@ -3,21 +3,31 @@ import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 import { ReactNode } from "react";
 import { useChatContext } from "@/contexts/ChatContext";
+import { cn } from "@/lib/utils";
 
 interface ChatCardProps {
   messages: any[];
   onClearChat: () => void;
   children: ReactNode;
+  className?: string;
 }
 
-export function ChatCard({ messages, onClearChat, children }: ChatCardProps) {
+export function ChatCard({
+  messages,
+  onClearChat,
+  children,
+  className,
+}: ChatCardProps) {
   const { currentChat, searchQuery } = useChatContext();
 
   return (
     <AnimatedCard
       delay={500}
       variant="Rotate"
-      className="w-full flex flex-col bg-background/80 backdrop-blur-sm border-background/20 shadow-xl"
+      className={cn(
+        "w-full flex flex-col bg-background/80 backdrop-blur-sm border-background/20 shadow-xl",
+        className
+      )}
       animationDisabled={!!searchQuery}
     >
       <div className="p-4 border-b border-border/50 flex items-center justify-between">
