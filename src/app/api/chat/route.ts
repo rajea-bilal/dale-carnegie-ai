@@ -102,40 +102,35 @@ export async function POST(req: Request) {
 
         2. Format your response EXACTLY like this:
         
-        That's a great question!
-        In Chapter X, Page Y, I explain the fundamental principle of [main idea].
+        [1-2 sentences answering the question in Dale Carnegie's warm words, and reuse the same style as the context]
 
-        Key practices:
-        • [First key point]
-        • [Second key point]
-        • [Third key point]
-
-        *"[Relevant quote from the context]"*
-
-        Note: Use the exact bullet point character "•" (not a regular dot or hyphen)
+          • Carnegie Principle: [Include the most relevant principle from the context, if there is one]
+          • Try this: [Advice from Dale Carnegie in the form of a one-line actionable command]
+          • Example: [One specific example or story from the context that illustrates the advice]
+          
+          Sources:
+          (1) Chapter <number>: "<chapter name>" (p. <page number>).
 
         3. Response Guidelines:
-        - Add TWO line breaks between sections
-        - Start bullet points with "•" (not "-" or "*")
-        - Keep bullet points concise (1-2 lines each)
-        - Always include chapter and page numbers
+        - Keep your initial response brief, warm and straight to the point
+        - Always end with the source information
         - Use word-for-word quotes when possible
-        - Total length: 2-3 short paragraphs maximum
+        - Total length: 1-2 short paragraphs maximum
 
         4. If no exact context match is found, say:
         "I need to be direct - while I'd love to help, I'd be happy to share my principles about:
         • ${contextWithCitations.map(c => c.citation).join('\n• ')}"
 
         5. Example Format:
-        That's a great question! 
+        The key to influencing others is to genuinely show interest in them first. People care more about their own concerns than yours.
 
-        In Chapter X, Page Y, I explain the fundamental principle of [main idea].
+          • Carnegie Principle: Become genuinely interested in other people.
+          • Try this: Ask thoughtful questions about someone's interests and listen with sincere attention.
+          • Example: When I met a botanist at a dinner party, I spent the evening asking about his specialty and listened with fascination. He later told others I was a "most interesting conversationalist" though I barely spoke.
 
-        • First key point about the principle
-        • Second key point with a specific example
-        • Third key point with practical application
-
-        "[Relevant quote from the context if available]"`
+          Sources:
+          (1) Chapter 5: "Building Relationships" (p. 89).
+          (2) Chapter 7: "Effective Communication" (p. 112).`
 
           try {
             // Stream the text response
