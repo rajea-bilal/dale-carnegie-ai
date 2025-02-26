@@ -10,14 +10,14 @@ const redis = new Redis({
 
 const ratelimit = new Ratelimit({
     redis: redis,
-    limiter: Ratelimit.fixedWindow(50, '1d'), // 15 requests per day
+    limiter: Ratelimit.fixedWindow(50, '1d'), // 50 requests per day
     ephemeralCache: new Map(),
     analytics: true,
     prefix: "ratelimit:carnegie",
 });
 
 const isAPI = (path: string) => {
-    return path.startsWith('/api/chat');
+    return path == '/api/chat';
 }
 
 // Rate Limit APIs
