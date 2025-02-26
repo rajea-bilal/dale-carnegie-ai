@@ -1,8 +1,6 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { useChatContext } from "@/contexts/ChatContext";
-import ChatListHeader from "./ChatListHeader";
 import { ChatListItem } from "./ChatListItem";
-import { ChatListFooter } from "./ChatListFooter";
 
 interface ChatListProps {
   chats: Array<{
@@ -16,6 +14,14 @@ interface ChatListProps {
 const ChatList: React.FC<ChatListProps> = () => {
   const { chats, currentChat, setCurrentChat, deleteChat } = useChatContext();
 
+  const handleChatSelect = useCallback((chat: any) => {
+    console.log("Entering handleChatSelect");
+    if (currentChat?.id !== chat.id) {
+      console.log("Selecting chat:", chat);
+      setCurrentChat(chat);
+    }
+  }, [currentChat?.id, setCurrentChat]);
+
   return (
     <div className="flex flex-col h-full">
       <div className="flex-1 overflow-y-auto p-3">
@@ -25,7 +31,7 @@ const ChatList: React.FC<ChatListProps> = () => {
             key={chat.id}
             chat={chat}
             isActive={currentChat?.id === chat.id}
-            onClick={() => setCurrentChat(chat)}
+            onClick={() => handleChatSelect(chat)}
             onDelete={() => deleteChat(chat.id)}
             index={index}
           />
@@ -35,4 +41,4 @@ const ChatList: React.FC<ChatListProps> = () => {
   );
 };
 
-export default ChatList;
+export default React.memo(ChatList);

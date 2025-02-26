@@ -4,7 +4,7 @@ import { useChat } from "@ai-sdk/react";
 import { MessageList } from "./MessageList";
 import { ChatInput } from "./ChatInput";
 import { Message } from "@/types";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { ChatCard } from "./ChatCard";
 import { useChatContext } from "@/contexts/ChatContext";
 import { useUser, useClerk } from "@clerk/nextjs";
@@ -22,6 +22,8 @@ export function ChatContainer() {
   const [statusMessage, setStatusMessage] = useState<string>();
   const { currentChat, updateChatMessages } = useChatContext();
   const { openSignUp } = useClerk();
+  const needsSavingRef = useRef(false);
+
 
   const {
     messages,
@@ -58,11 +60,33 @@ export function ChatContainer() {
     initialMessages: currentChat?.messages,
   });
 
-  // // Initialize messages from current chat when it changes
+  // Update the chat messages when they change
   useEffect(() => {
     if (!currentChat) return;
-    updateChatMessages(currentChat.id, messages);
-  }, [messages]);
+
+    // Only update context immediately for UI updates
+    if (messages.length > 0 &&
+      JSON.stringify(messages) !== JSON.stringify(currentChat.messages)) {
+
+      // Update the UI context
+      updateChatMessages(currentChat.id, messages);
+
+      // Mark that we need to save once loading is complete
+      if (isLoading) {
+        needsSavingRef.current = true;
+      }
+    }
+  }, [messages, updateChatMessages, isLoading]);
+
+  // Separate effect to handle saving when loading completes
+  useEffect(() => {
+    // When loading finishes and we have pending saves
+    if (!isLoading && needsSavingRef.current && currentChat) {
+      console.log("Stream completed, saving messages to database");
+      saveMessages(messages);
+      needsSavingRef.current = false;
+    }
+  }, [isLoading, messages, currentChat]);
 
   // Handle status messages from the stream
   useEffect(() => {
@@ -89,6 +113,32 @@ export function ChatContainer() {
     originalHandleSubmit(e);
   };
 
+  // Add this function to save messages when they change
+  const saveMessages = useCallback(
+    async (messagesToSave: Message[]) => {
+      if (!currentChat || messagesToSave.length === 0) return;
+
+      try {
+        console.log("Saving messages to database:", messagesToSave.length);
+
+        // Save messages to database
+        await fetch(`/api/chats/${currentChat.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            updates: {
+              messages: messagesToSave,
+              updatedAt: new Date().toISOString()
+            }
+          })
+        });
+      } catch (error) {
+        console.error('Error saving messages:', error);
+      }
+    },
+    [currentChat]
+  );
+
   return (
     <ChatCard
       className="flex flex-col flex-grow min-h-0 overflow-hidden"
@@ -96,7 +146,8 @@ export function ChatContainer() {
       onClearChat={handleClearChat}
     >
       <div className="flex flex-col flex-grow min-h-0">
-        <MessageList messages={messages} />
+        <MessageList messages={currentChat?.messages} />
+        {/* <MessageList messages={messages} /> */}
       </div>
       <div className="p-4 border-t">
         <ChatInput

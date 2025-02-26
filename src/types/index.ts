@@ -25,7 +25,7 @@ export interface ChatState {
 }
 
 export interface MessageListProps {
-  messages: Message[];
+  messages: Message[] | undefined;
 }
 
 export interface MessageBubbleProps {

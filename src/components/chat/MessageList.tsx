@@ -9,12 +9,13 @@ export function MessageList({ messages }: MessageListProps) {
 
   // Auto scroll to bottom when new messages arrive
   useEffect(() => {
+    console.log('messages', messages)
     if (scrollRef.current) {
       scrollRef.current.scrollIntoView({ behavior: 'smooth' })
     }
   }, [messages])
 
-  if (!messages.length) {
+  if (!messages || messages.length === 0) {
     return (
       <ScrollArea className="h-full p-4">
         <div className="flex items-center justify-center h-full">
