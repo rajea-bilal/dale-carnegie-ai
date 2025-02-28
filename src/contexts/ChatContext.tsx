@@ -1,8 +1,14 @@
 "use client";
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
-import { ChatData } from '../utils/Storage';
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from "react";
 import { useUser, useClerk } from "@clerk/nextjs";
 import toast from "react-hot-toast";
+import { ChatData } from "@/types";
 
 interface ChatContextType {
   chats: ChatData[];
@@ -13,7 +19,6 @@ interface ChatContextType {
   deleteChat: (id: string) => Promise<void>;
   searchQuery: string;
   setSearchQuery: (query: string) => void;
-  updateChatMessages: (id: string, messages: any[]) => Promise<void>;
   isLoading: boolean;
 }
 
@@ -21,7 +26,7 @@ const ChatContext = createContext<ChatContextType | undefined>(undefined);
 
 export function ChatProvider({ children }: { children: ReactNode }) {
   const [chats, setChats] = useState<ChatData[]>([]);
-  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [searchQuery, setSearchQuery] = useState<string>("");
   const [currentChat, setCurrentChat] = useState<ChatData | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const { user, isSignedIn } = useUser();
@@ -41,8 +46,8 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   const fetchChats = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch('/api/chats');
-      if (!response.ok) throw new Error('Failed to fetch chats');
+      const response = await fetch("/api/chats");
+      if (!response.ok) throw new Error("Failed to fetch chats");
 
       const data = await response.json();
 
@@ -59,8 +64,8 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         setCurrentChat(data[0]);
       }
     } catch (error) {
-      console.error('Error fetching chats:', error);
-      toast.error('Failed to load chats');
+      console.error("Error fetching chats:", error);
+      toast.error("Failed to load chats");
     } finally {
       setIsLoading(false);
     }
@@ -73,20 +78,20 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     }
 
     try {
-      const response = await fetch('/api/chats', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title: 'New Chat' })
+      const response = await fetch("/api/chats", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title: "New Chat" }),
       });
 
-      if (!response.ok) throw new Error('Failed to create chat');
+      if (!response.ok) throw new Error("Failed to create chat");
 
       const newChat = await response.json();
-      setChats(prev => [newChat, ...prev]);
+      setChats((prev) => [newChat, ...prev]);
       setCurrentChat(newChat);
     } catch (error) {
-      console.error('Error creating chat:', error);
-      toast.error('Failed to create new chat');
+      console.error("Error creating chat:", error);
+      toast.error("Failed to create new chat");
     }
   };
 
@@ -94,34 +99,16 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     if (!isSignedIn) return;
 
     try {
-      const response = await fetch(`/api/chats/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updates)
-      });
-
-      if (!response.ok) throw new Error('Failed to update chat');
-
-      const updatedChat = await response.json();
-
-      setChats(prev => prev.map(chat =>
-        chat.id === id ? { ...chat, ...updatedChat } : chat
-      ));
+      setChats((prev) =>
+        prev.map((chat) => (chat.id === id ? { ...chat, ...updates } : chat))
+      );
 
       if (currentChat?.id === id) {
-        setCurrentChat(prev => prev ? { ...prev, ...updatedChat } : null);
+        setCurrentChat((prev) => (prev ? { ...prev, ...updates } : null));
       }
     } catch (error) {
-      console.error('Error updating chat:', error);
-      toast.error('Failed to update chat');
-    }
-  };
-
-  const updateChatMessages = async (id: string, messages: any[]) => {
-    if (!isSignedIn || !currentChat) return;
-
-    if (currentChat.id === id) {
-      setCurrentChat(prev => prev ? { ...prev, messages } : null);
+      console.error("Error updating chat:", error);
+      toast.error("Failed to update chat");
     }
   };
 
@@ -131,13 +118,13 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     try {
       // Delete the chat
       const response = await fetch(`/api/chats/${id}`, {
-        method: 'DELETE'
+        method: "DELETE",
       });
 
-      if (!response.ok) throw new Error('Failed to delete chat');
+      if (!response.ok) throw new Error("Failed to delete chat");
 
       // Remove the deleted chat from state
-      setChats(prev => prev.filter(chat => chat.id !== id));
+      setChats((prev) => prev.filter((chat) => chat.id !== id));
 
       // If we just deleted the current chat or the last chat
       if (currentChat?.id === id || chats.length <= 1) {
@@ -146,20 +133,22 @@ export function ChatProvider({ children }: { children: ReactNode }) {
           await createChat();
         } else {
           // Otherwise select another existing chat
-          const remainingChats = chats.filter(chat => chat.id !== id);
+          const remainingChats = chats.filter((chat) => chat.id !== id);
           setCurrentChat(remainingChats[0]);
         }
       }
     } catch (error) {
-      console.error('Error deleting chat:', error);
-      toast.error('Failed to delete chat');
+      console.error("Error deleting chat:", error);
+      toast.error("Failed to delete chat");
     }
   };
 
   return (
     <ChatContext.Provider
       value={{
-        chats: chats.filter(chat => chat.title.toLowerCase().includes(searchQuery.toLowerCase())),
+        chats: chats.filter((chat) =>
+          chat.title.toLowerCase().includes(searchQuery.toLowerCase())
+        ),
         currentChat,
         setCurrentChat,
         createChat,
@@ -167,8 +156,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         deleteChat,
         searchQuery,
         setSearchQuery,
-        updateChatMessages,
-        isLoading
+        isLoading,
       }}
     >
       {children}

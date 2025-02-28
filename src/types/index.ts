@@ -50,3 +50,11 @@ export interface VectorEntry {
     citations: string;
   }
 } 
+
+export interface ChatData {
+  id: string;
+  title: string;
+  messages: Message[];
+  createdAt: string;
+  updatedAt: string;
+}
