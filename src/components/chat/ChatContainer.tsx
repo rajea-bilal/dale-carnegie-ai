@@ -85,6 +85,11 @@ export function ChatContainer() {
     }
   }, [messages]);
 
+  // Set the messages to the current chat messages when the chat is changed
+  useEffect(() => {
+    setMessages(currentChat?.messages ?? []);
+  }, [currentChat?.id]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) {
