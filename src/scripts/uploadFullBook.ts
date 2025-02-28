@@ -183,10 +183,10 @@ async function testPineconeContent() {
 async function main() {
   try {
     // Step 1: Read the book file
-    console.log('Reading the book file...')
+    console.log('Reading the full book file...')
 
     // creates a full path to where the book text is stored on local machine
-    const contentPath = path.join(process.cwd(), 'data', 'carnegie.txt')
+    const contentPath = path.join(process.cwd(), 'data', 'carnegie-full.txt')
 
     // opens the book text file and reads it into a variable
     const content = fs.readFileSync(contentPath, 'utf-8')
@@ -203,14 +203,12 @@ async function main() {
     console.log('Uploading chunks to database...')
     console.log('This may take a while, please be patient...')
     
-
     // chunks variable is an array of objects
     // loop through each object(chunk) and upload it to pinecone using the uploadChunkToVectorDB function
     for (let i = 0; i < chunks.length; i++) {
       await uploadChunkToVectorDB(chunks[i], i)
     }
 
-   
     console.log('Verifying upload...')
 
     // ask pinecone to give us some stats abt the upload
@@ -220,7 +218,7 @@ async function main() {
     // prints how many total chunks we stored in pinecone db
     await testPineconeContent()
     
-    console.log('All done! The content is ready to be used by the AI.')
+    console.log('All done! The full book content is ready to be used by the AI.')
   } catch (error) {
     console.error('Something went wrong:', error)
     process.exit(1)
@@ -228,5 +226,5 @@ async function main() {
 }
 
 // Start the process
-console.log('Starting the content upload process...')
+console.log('Starting the full book upload process...')
 main() 
