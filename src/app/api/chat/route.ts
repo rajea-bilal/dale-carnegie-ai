@@ -1,5 +1,5 @@
 import { openai } from "@ai-sdk/openai";
-import { createDataStreamResponse, streamText } from "ai";
+import { createDataStreamResponse, generateText, streamText } from "ai";
 import { index } from "@/lib/pinecone";
 import { getEmbedding } from "@/lib/openai";
 import { getAuth } from "@clerk/nextjs/server";
@@ -40,6 +40,7 @@ interface IChatRepository {
   validateChat(chatId: string, userId: string): Promise<string | null>;
   updateChatTimestamp(chatId: string): Promise<void>;
   saveMessage(chatId: string, role: string, content: string): Promise<void>;
+  updateChatTitle(chatId: string, title: string): Promise<void>;
 }
 
 interface IContextSearchService {
@@ -47,8 +48,18 @@ interface IContextSearchService {
 }
 
 interface IResponseGenerationService {
-  generateIdentityResponse(messages: Message[], chatId: string, dataStream: any): Promise<any>;
-  generateContextualResponse(messages: Message[], context: string, contextWithCitations: CitationItem[], chatId: string, dataStream: any): Promise<void>;
+  generateIdentityResponse(
+    messages: Message[],
+    chatId: string,
+    dataStream: any
+  ): Promise<any>;
+  generateContextualResponse(
+    messages: Message[],
+    context: string,
+    contextWithCitations: CitationItem[],
+    chatId: string,
+    dataStream: any
+  ): Promise<void>;
 }
 
 // ======= IMPLEMENTATIONS =======
@@ -73,11 +84,23 @@ class PostgresChatRepository implements IChatRepository {
     `;
   }
 
-  async saveMessage(chatId: string, role: string, content: string): Promise<void> {
+  async saveMessage(
+    chatId: string,
+    role: string,
+    content: string
+  ): Promise<void> {
     const now = new Date().toISOString();
     await sql`
       INSERT INTO messages (chat_id, role, content, created_at)
       VALUES (${chatId}, ${role}, ${content}, ${now})
+    `;
+  }
+
+  async updateChatTitle(chatId: string, title: string): Promise<void> {
+    await sql`
+      UPDATE chats
+      SET title = ${title}
+      WHERE id = ${chatId}
     `;
   }
 }
@@ -92,7 +115,7 @@ class PineconeContextSearchService implements IContextSearchService {
     const embedding = await getEmbedding(query).catch(() => {
       throw new Error("Failed to generate embedding. Please try again.");
     });
-    
+
     console.log("2. Embedding generated:", {
       length: embedding.length,
       sample: embedding.slice(0, 5),
@@ -126,7 +149,7 @@ class PineconeContextSearchService implements IContextSearchService {
     }));
 
     console.log("5. Processed citations:", allContextItems);
-    
+
     // Only use the top 2-3 most relevant chunks for context
     const topItems = allContextItems.slice(0, 3);
     const context = topItems.map((item) => item.text).join("\n");
@@ -152,7 +175,11 @@ class OpenAIResponseGenerationService implements IResponseGenerationService {
     this.chatRepository = chatRepository;
   }
 
-  async generateIdentityResponse(messages: Message[], chatId: string, dataStream: any) {
+  async generateIdentityResponse(
+    messages: Message[],
+    chatId: string,
+    dataStream: any
+  ) {
     const result = await streamText({
       model: openai("gpt-4o-mini"),
       messages: [
@@ -164,17 +191,30 @@ class OpenAIResponseGenerationService implements IResponseGenerationService {
         ...messages,
       ],
       onFinish: async (completion) => {
-        await this.chatRepository.saveMessage(chatId, "assistant", completion.text);
+        await this.chatRepository.saveMessage(
+          chatId,
+          "assistant",
+          completion.text
+        );
         dataStream.writeData("response completed");
       },
     });
-    
+
     return result.mergeIntoDataStream(dataStream);
   }
 
-  async generateContextualResponse(messages: Message[], context: string, contextWithCitations: CitationItem[], chatId: string, dataStream: any): Promise<void> {
+  async generateContextualResponse(
+    messages: Message[],
+    context: string,
+    contextWithCitations: CitationItem[],
+    chatId: string,
+    dataStream: any
+  ): Promise<void> {
     try {
-      const systemPrompt = this.generateSystemPrompt(context, contextWithCitations);
+      const systemPrompt = this.generateSystemPrompt(
+        context,
+        contextWithCitations
+      );
 
       // Stream the text response
       const result = await streamText({
@@ -187,7 +227,11 @@ class OpenAIResponseGenerationService implements IResponseGenerationService {
           ...messages,
         ],
         onFinish: async (completion) => {
-          await this.chatRepository.saveMessage(chatId, "assistant", completion.text);
+          await this.chatRepository.saveMessage(
+            chatId,
+            "assistant",
+            completion.text
+          );
           dataStream.writeData("response completed");
         },
       });
@@ -200,7 +244,10 @@ class OpenAIResponseGenerationService implements IResponseGenerationService {
   }
 
   // Helper method to generate system prompt - private to encapsulate implementation details
-  private generateSystemPrompt(context: string, contextWithCitations: CitationItem[]): string {
+  private generateSystemPrompt(
+    context: string,
+    contextWithCitations: CitationItem[]
+  ): string {
     return `
     I am Dale Carnegie. 
 
@@ -264,26 +311,68 @@ class ChatMessageHandler {
     this.responseGenerationService = responseGenerationService;
   }
 
-  async validateAndUpdateChat(userId: string, chatId: string): Promise<string | null> {
+  async validateAndUpdateChat(
+    userId: string,
+    chatId: string
+  ): Promise<string | null> {
     const validChatId = await this.chatRepository.validateChat(chatId, userId);
-    
+
     if (validChatId) {
       await this.chatRepository.updateChatTimestamp(validChatId);
     }
-    
+
     return validChatId;
   }
 
-  async saveUserMessage(chatId: string, role: string, content: string): Promise<void> {
+  async saveUserMessage(
+    chatId: string,
+    role: string,
+    content: string
+  ): Promise<void> {
     await this.chatRepository.saveMessage(chatId, role, content);
   }
 
-  createStreamingResponse(messages: Message[], lastMessage: Message, chatId: string) {
+  async generateAndUpdateChatTitle(
+    chatId: string,
+    firstMessage: string
+  ): Promise<string | void> {
+    try {
+      const { text: title } = await generateText({
+        model: openai("gpt-4o-mini"),
+        prompt: `Generate a concise and descriptive title (maximum 6 words) for a chat that starts with this message: "${firstMessage}", do not include quotes.`,
+      });
+
+      // Update the chat title in the database
+      await this.chatRepository.updateChatTitle(chatId, title);
+
+      console.log(`Generated and updated chat title: ${title}`);
+
+      return title;
+    } catch (error) {
+      console.error("Error generating chat title:", error);
+      // If title generation fails, we continue without updating the title
+    }
+  }
+
+  createStreamingResponse(
+    messages: Message[],
+    lastMessage: Message,
+    chatId: string,
+    title?: string
+  ) {
+    const headers: Record<string, string> = {
+      "X-Chat-ID": chatId,
+    };
+
+    if (title) headers["X-Chat-Title"] = title;
+
     return createDataStreamResponse({
       execute: async (dataStream) => {
         try {
           // Check if this is an identity question
-          const isIdentityQuestion = this.isIdentityQuestion(lastMessage.content);
+          const isIdentityQuestion = this.isIdentityQuestion(
+            lastMessage.content
+          );
 
           if (isIdentityQuestion) {
             // Handle identity question
@@ -294,7 +383,12 @@ class ChatMessageHandler {
             );
           } else {
             // Process normal query
-            await this.processRegularQuery(messages, lastMessage, chatId, dataStream);
+            await this.processRegularQuery(
+              messages,
+              lastMessage,
+              chatId,
+              dataStream
+            );
           }
         } catch (error) {
           // Handle specific errors in the stream
@@ -309,20 +403,32 @@ class ChatMessageHandler {
         console.error("Stream error:", error);
         return "An error occurred during the conversation. Please try again.";
       },
-      data: { chatId }, // Return the chatId in the response
+      headers,
     });
   }
 
   // Private helper methods following Single Responsibility Principle
   private isIdentityQuestion(content: string): boolean {
-    return Boolean(content.toLowerCase().match(/who are you|what are you|tell me about yourself/));
+    return Boolean(
+      content
+        .toLowerCase()
+        .match(/who are you|what are you|tell me about yourself/)
+    );
   }
 
-  private async processRegularQuery(messages: Message[], lastMessage: Message, chatId: string, dataStream: any): Promise<void> {
+  private async processRegularQuery(
+    messages: Message[],
+    lastMessage: Message,
+    chatId: string,
+    dataStream: any
+  ): Promise<void> {
     try {
       // Search for relevant context
-      const searchResult = await this.contextSearchService.search(lastMessage.content, dataStream);
-      
+      const searchResult = await this.contextSearchService.search(
+        lastMessage.content,
+        dataStream
+      );
+
       // Add citations as message annotation
       dataStream.writeMessageAnnotation({
         citations: searchResult.citations,
@@ -351,7 +457,9 @@ export async function POST(req: NextRequest) {
     // Set up services using Dependency Injection
     const chatRepository = new PostgresChatRepository();
     const contextSearchService = new PineconeContextSearchService();
-    const responseGenerationService = new OpenAIResponseGenerationService(chatRepository);
+    const responseGenerationService = new OpenAIResponseGenerationService(
+      chatRepository
+    );
     const chatHandler = new ChatMessageHandler(
       chatRepository,
       contextSearchService,
@@ -368,18 +476,38 @@ export async function POST(req: NextRequest) {
     }
 
     // Validate and update chat
-    const currentChatId = await chatHandler.validateAndUpdateChat(userId, chatId);
-    
+    const currentChatId = await chatHandler.validateAndUpdateChat(
+      userId,
+      chatId
+    );
+
     if (!currentChatId) {
       return new Response("Chat not found", { status: 404 });
     }
 
     // Save user message to database
-    await chatHandler.saveUserMessage(currentChatId, lastMessage.role, lastMessage.content);
+    await chatHandler.saveUserMessage(
+      currentChatId,
+      lastMessage.role,
+      lastMessage.content
+    );
+
+    let chatTitle;
+    // Generate and update chat title
+    if (messages.length === 1) {
+      chatTitle = await chatHandler.generateAndUpdateChatTitle(
+        currentChatId,
+        lastMessage.content
+      );
+    }
 
     // Create and return streaming response
-    return chatHandler.createStreamingResponse(messages, lastMessage, currentChatId);
-    
+    return chatHandler.createStreamingResponse(
+      messages,
+      lastMessage,
+      currentChatId,
+      chatTitle
+    );
   } catch (error) {
     console.error("Chat error:", error);
     return new Response("Failed to process your request. Please try again.", {

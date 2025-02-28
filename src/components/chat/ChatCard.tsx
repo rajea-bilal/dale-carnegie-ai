@@ -6,18 +6,11 @@ import { useChatContext } from "@/contexts/ChatContext";
 import { cn } from "@/lib/utils";
 
 interface ChatCardProps {
-  messages: any[];
-  onClearChat: () => void;
   children: ReactNode;
   className?: string;
 }
 
-export function ChatCard({
-  messages,
-  onClearChat,
-  children,
-  className,
-}: ChatCardProps) {
+export function ChatCard({ children, className }: ChatCardProps) {
   const { currentChat, searchQuery } = useChatContext();
 
   return (
@@ -32,17 +25,6 @@ export function ChatCard({
     >
       <div className="p-4 border-b border-border/50 flex items-center justify-between">
         <h2 className="text-lg font-semibold">{currentChat?.title}</h2>
-        {messages.length > 0 && (
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onClearChat}
-            className="h-8 w-8 text-muted-foreground hover:text-destructive"
-            title="Clear conversation"
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
-        )}
       </div>
       {children}
     </AnimatedCard>

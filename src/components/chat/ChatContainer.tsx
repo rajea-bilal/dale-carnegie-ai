@@ -35,8 +35,11 @@ export function ChatContainer() {
   } = useChat({
     api: "/api/chat",
     onResponse: (response: Response) => {
-      if (response.ok) {
-        console.log("Response started");
+      if (!response.ok || !currentChat) return;
+      const headers = response.headers;
+      const chatTitle = headers.get("X-Chat-Title");
+      if (chatTitle) {
+        updateChat(currentChat?.id, { title: chatTitle });
       }
     },
     onError: (error: Error) => {
@@ -82,11 +85,6 @@ export function ChatContainer() {
     }
   }, [messages]);
 
-  const handleClearChat = () => {
-    setMessages([]);
-    setStatusMessage(undefined);
-  };
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) {
@@ -97,11 +95,7 @@ export function ChatContainer() {
   };
 
   return (
-    <ChatCard
-      className="flex flex-col flex-grow min-h-0 overflow-hidden"
-      messages={messages}
-      onClearChat={handleClearChat}
-    >
+    <ChatCard className="flex flex-col flex-grow min-h-0 overflow-hidden">
       <div className="flex flex-col flex-grow min-h-0">
         <MessageList messages={currentChat?.messages} />
         {/* <MessageList messages={messages} /> */}
