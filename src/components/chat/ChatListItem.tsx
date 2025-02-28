@@ -29,7 +29,7 @@ export const ChatListItem = memo(function ChatListItem({
     <AnimatedCard
       variant="Rotate"
       delay={(index * 150) - (50 * index) + 300}
-      className={`p-3 mb-2 cursor-pointer hover:bg-background/90 transition-colors
+      className={`p-3 mb-2 cursor-pointer hover:bg-background/90 transition-colors shrink-0
         ${isActive
           ? "bg-background/90 border-border/50"
           : "bg-background/50 border-background/20"
