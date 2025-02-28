@@ -1,8 +1,8 @@
 "use client";
 import React, { memo } from 'react';
-import { ChatData } from '../../utils/Storage';
 import { AnimatedCard } from "@/components/ui/card";
 import { TrashIcon } from 'lucide-react';
+import { ChatData } from '@/types';
 
 interface ChatListItemProps {
   chat: ChatData;
