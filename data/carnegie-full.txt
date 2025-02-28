@@ -24,7 +24,7 @@ HOMER CROY
 
 ----- Page 9 -----
 
-PART ONE 
+PART: 1 
 PRINCIPLE 1: Don’t criticize, condemn or complain.
  
  
@@ -1300,7 +1300,7 @@ PRINCIPLE 1: Become genuinely interested in other people.
  
 ----- Page 32 -----
 
-PART TWO 
+PART: 2 
  
  
  
@@ -2815,7 +2815,7 @@ PRINCIPLE 1: The only way to get the best of an argument is to avoid it.
 
 ----- Page 61 -----
 
-PART THREE 
+PART: 3 
  
  
  
@@ -4916,7 +4916,7 @@ PRINCIPLE 1: Begin with praise and honest appreciation.
  
 ----- Page 104 -----
 
-PART FOUR 
+PART: 4 
  
  
  
