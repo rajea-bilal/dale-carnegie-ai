@@ -5,6 +5,7 @@ import { StatusIndicator } from "./StatusIndicator";
 import { AudioPlayer } from "./AudioPlayer";
 import Image from "next/image";
 import carnegieAvatarSrc from "@/assets/avatar.jpg";
+import Markdown from "react-markdown";
 
 // This component displays a single message in our chat
 // It handles both user messages and Dale's (assistant) responses
@@ -39,7 +40,10 @@ export function MessageBubble({ message, isLastMessage }: MessageBubbleProps) {
     // Wrapper that handles message positioning
     // User messages go to the right, Dale's to the left
     <div
-      className={cn("flex w-full gap-1.5", isUser ? "justify-end" : "justify-start")}
+      className={cn(
+        "flex w-full gap-1.5",
+        isUser ? "justify-end" : "justify-start"
+      )}
     >
       {!isUser && (
         <Image
@@ -56,13 +60,15 @@ export function MessageBubble({ message, isLastMessage }: MessageBubbleProps) {
       <div
         className={cn(
           "rounded-lg px-4 py-2 max-w-[80%]",
-          isUser ? "bg-primary text-primary-foreground" : "bg-muted"
+          isUser ? "bg-primary [&_*]:!text-primary-foreground" : "bg-muted"
         )}
       >
         {/* Container for message text and audio player */}
         <div className="flex items-start justify-between gap-2">
           {/* The actual message text */}
-          <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+          <div className="text-sm whitespace-pre-wrap prose prose-sm max-w-none markdown-content">
+            <Markdown>{message.content}</Markdown>
+          </div>
 
           {/* Audio player only shows for Dale's messages */}
           {/* We also make sure there's actual content to speak */}
@@ -78,7 +84,7 @@ export function MessageBubble({ message, isLastMessage }: MessageBubbleProps) {
         {/* we show them below the message */}
         {message.citations && message.citations.length > 0 && (
           <div className="mt-2 space-y-1 border-t border-border/50 pt-2">
-            <p className="text-xs text-muted-foreground font-medium">
+            <p className="text-xs text-muted-foreground font-semibold">
               Sources:
             </p>
             {/* List each citation with a bullet point */}
@@ -88,7 +94,7 @@ export function MessageBubble({ message, isLastMessage }: MessageBubbleProps) {
                 className="text-xs text-muted-foreground flex items-start gap-1"
               >
                 <span>•</span>
-                <span>{citation}</span>
+                <span className="italic">{citation}</span>
               </div>
             ))}
           </div>

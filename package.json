@@ -36,6 +36,7 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-hot-toast": "^2.5.2",
+    "react-markdown": "^10.0.0",
     "tailwind-merge": "^3.0.1",
     "tailwindcss-animate": "^1.0.7",
     "zod": "^3.24.1"
@@ -43,6 +44,7 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@shadcn/ui": "^0.0.4",
+    "@tailwindcss/typography": "^0.5.16",
     "@types/lodash": "^4.17.15",
     "@types/node": "^20",
     "@types/react": "^19",

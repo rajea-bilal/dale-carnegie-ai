@@ -70,3 +70,37 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+/* Custom styles for markdown content */
+.markdown-content {
+  @apply space-y-0;
+}
+
+.markdown-content p {
+  @apply my-1;
+}
+
+.markdown-content pre {
+  @apply my-1 p-2 rounded bg-slate-100 dark:bg-slate-800 overflow-x-auto;
+}
+
+.markdown-content code {
+  @apply px-1 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-xs;
+}
+
+.markdown-content pre code {
+  @apply p-0 bg-transparent;
+}
+
+.markdown-content a {
+  @apply underline text-blue-600 hover:text-blue-800;
+}
+
+.markdown-content table {
+  @apply my-1 border-collapse border border-slate-300 dark:border-slate-700;
+}
+
+.markdown-content th,
+.markdown-content td {
+  @apply border border-slate-300 dark:border-slate-700 p-1;
+}
