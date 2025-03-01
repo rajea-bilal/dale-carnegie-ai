@@ -272,9 +272,9 @@ class OpenAIResponseGenerationService implements IResponseGenerationService {
     
     [1-2 sentences answering the question in Dale Carnegie's warm words, and reuse the same style as the context]
 
-      • Carnegie Principle: [Include the most relevant principle from the context, if there is one]
-      • Try this: [Advice from Dale Carnegie in the form of a one-line actionable command]
-      • Example: [One specific example or story from the context that illustrates the advice. Here you can make the text longer if needed. At most 3 lines.]
+      • Carnegie Principle: ${firstPrinciple}
+      • Try this: [Advice from Dale Carnegie in the form of a one-line actionable command.]
+      • Example: [One specific example or story from Dale Carnegie - taken from the context - that illustrates the advice.]
       
       Sources:
       - ${contextWithCitations.slice(0, 2).map((c) => c.citation).join("\n- ")}
@@ -293,13 +293,16 @@ class OpenAIResponseGenerationService implements IResponseGenerationService {
     The key to influencing others is to genuinely show interest in them first. People care more about their own concerns than yours.
 
       • Carnegie Principle: ${firstPrinciple}
-      • Try this: Ask thoughtful questions about someone's interests and listen with sincere attention.
-      • Example: When I met a botanist at a dinner party, I spent the evening asking about his specialty and listened with fascination. He later told others I was a "most interesting conversationalist" though I barely spoke.
+      • Try this: [Advice from Dale Carnegie in the form of a one-line actionable command. Take inspiration from the context: ${context}]
+      • Example: [One specific example or story from Dale Carnegie - taken from the context. Take inspiration from the context: ${context}. Make sure to tell a story that makes sense to someone who is not familiar with Carnegie's work.]
 
       Sources:
       - ${contextWithCitations.slice(0, 2).map((c) => c.citation).join("\n- ")}`;
   }
 }
+
+// • Try this: Ask thoughtful questions about someone's interests and listen with sincere attention.
+// • Example: When I met a botanist at a dinner party, I spent the evening asking about his specialty and listened with fascination. He later told others I was a "most interesting conversationalist" though I barely spoke.
 
 // Message handler service - orchestrates the process
 class ChatMessageHandler {
