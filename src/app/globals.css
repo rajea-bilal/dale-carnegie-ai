@@ -34,6 +34,7 @@ body {
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
   }
+
   .dark {
     --background: 240 10% 3.9%;
     --foreground: 0 0% 98%;
@@ -66,41 +67,35 @@ body {
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
   }
 }
 
-/* Custom styles for markdown content */
+/* Custom styles for markdown content with better targeting */
 .markdown-content {
   @apply space-y-0;
 }
 
+/* Regular paragraphs have normal line height */
 .markdown-content p {
-  @apply my-1;
+  @apply my-1 leading-normal;
 }
 
-.markdown-content pre {
-  @apply my-1 p-2 rounded bg-slate-100 dark:bg-slate-800 overflow-x-auto;
+/* Sources section specific styling */
+.markdown-content p:last-of-type {
+  @apply mb-0;
 }
 
-.markdown-content code {
-  @apply px-1 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-xs;
+.markdown-content ul:last-of-type {
+  @apply mt-0 space-y-0 leading-[1];
 }
 
-.markdown-content pre code {
-  @apply p-0 bg-transparent;
+.markdown-content ul:last-of-type li {
+  @apply my-0 py-0 leading-tight;
 }
 
-.markdown-content a {
-  @apply underline text-blue-600 hover:text-blue-800;
-}
-
-.markdown-content table {
-  @apply my-1 border-collapse border border-slate-300 dark:border-slate-700;
-}
-
-.markdown-content th,
-.markdown-content td {
-  @apply border border-slate-300 dark:border-slate-700 p-1;
+.markdown-content ul:last-of-type li em {
+  @apply leading-tight;
 }

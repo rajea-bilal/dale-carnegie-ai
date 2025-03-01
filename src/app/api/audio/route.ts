@@ -17,7 +17,11 @@ export async function POST(req: Request) {
   try {
     console.log('🎙️ Audio generation request received')
 
-    const { text } = await req.json()
+    const { text: rawText } = await req.json()
+    // Remove everything after "Sources:" if present
+    const text = rawText.includes('Sources:')
+      ? rawText.substring(0, rawText.indexOf('Sources:'))
+      : rawText
     console.log('Text to convert:', text)
 
     if (!text) {

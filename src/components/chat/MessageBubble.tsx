@@ -79,26 +79,6 @@ export function MessageBubble({ message, isLastMessage }: MessageBubbleProps) {
             />
           )}
         </div>
-
-        {/* If the message has citations (references to the book), */}
-        {/* we show them below the message */}
-        {message.citations && message.citations.length > 0 && (
-          <div className="mt-2 space-y-1 border-t border-border/50 pt-2">
-            <p className="text-xs text-muted-foreground font-semibold">
-              Sources:
-            </p>
-            {/* List each citation with a bullet point */}
-            {message.citations.map((citation, index) => (
-              <div
-                key={index}
-                className="text-xs text-muted-foreground flex items-start gap-1"
-              >
-                <span>•</span>
-                <span className="italic">{citation}</span>
-              </div>
-            ))}
-          </div>
-        )}
       </div>
     </div>
   );

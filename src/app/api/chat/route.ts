@@ -144,9 +144,9 @@ class PineconeContextSearchService implements IContextSearchService {
 
     // Process and prepare citations
     const allContextItems = results.matches?.map((match) => ({
-      text: match.metadata?.text,
-      principle: match.metadata?.principle,
-      citation: match.metadata?.citation,
+      text: match.metadata?.text as string,
+      principle: match.metadata?.principle as string,
+      citation: match.metadata?.citation as string,
       // citation: `${match.metadata?.chapter}, Page ${match.metadata?.pageNumber}`,
       relevanceScore: match.score,
     }));
@@ -253,7 +253,7 @@ class OpenAIResponseGenerationService implements IResponseGenerationService {
     context: string,
     contextWithCitations: CitationItem[]
   ): string {
-    const firstPrinciple = contextWithCitations[0].principle.split(':').slice(1).join(':').trim();
+    const firstPrinciple = contextWithCitations[0]?.principle?.split(':').slice(1).join(':').trim() || '';
 
     return `
     I am Dale Carnegie. 
@@ -272,18 +272,19 @@ class OpenAIResponseGenerationService implements IResponseGenerationService {
     
     [1-2 sentences answering the question in Dale Carnegie's warm words, and reuse the same style as the context]
 
-      • Carnegie Principle: ${firstPrinciple}
-      • Try this: [Advice from Dale Carnegie in the form of a one-line actionable command.]
-      • Example: [One specific example or story from Dale Carnegie - taken from the context - that illustrates the advice.]
+      • **Carnegie Principle:** ${firstPrinciple}
+      • **Try this:** [Advice from Dale Carnegie in the form of a one-line actionable command.]
+      • **Example:** [One specific example or story from Dale Carnegie - taken from the context - that illustrates the advice.]
       
       Sources:
-      - ${contextWithCitations.slice(0, 2).map((c) => c.citation).join("\n- ")}
+      - *${contextWithCitations.slice(0, 2).map((c) => c.citation).join("\n- ")}*
 
     3. Response Guidelines:
     - Keep your initial response brief, warm and straight to the point
     - Always end with the source information
     - Use word-for-word quotes when possible
     - Total length: 1-2 short paragraphs maximum
+    - Make sure to format the response in markdown: "Carnegie Principle:", "Try this:", and "Example:" should be in bold, and citations should be in italic
 
     4. If no exact context match is found, say:
     "I need to be direct - while I'd love to help, I'd be happy to share my principles about:
@@ -292,12 +293,12 @@ class OpenAIResponseGenerationService implements IResponseGenerationService {
     5. Example Format:
     The key to influencing others is to genuinely show interest in them first. People care more about their own concerns than yours.
 
-      • Carnegie Principle: ${firstPrinciple}
-      • Try this: [Advice from Dale Carnegie in the form of a one-line actionable command. Take inspiration from the context: ${context}]
-      • Example: [One specific example or story from Dale Carnegie - taken from the context. Take inspiration from the context: ${context}. Make sure to tell a story that makes sense to someone who is not familiar with Carnegie's work.]
+      • **Carnegie Principle:** ${firstPrinciple}
+      • **Try this:** [Advice from Dale Carnegie in the form of a one-line actionable command. Take inspiration from the context: ${context}]
+      • **Example:** [One specific example or story from Dale Carnegie - taken from the context. Take inspiration from the context: ${context}. Make sure to tell a story that makes sense to someone who is not familiar with Carnegie's work.]
 
       Sources:
-      - ${contextWithCitations.slice(0, 2).map((c) => c.citation).join("\n- ")}`;
+      - *${contextWithCitations.slice(0, 2).map((c) => c.citation).join("\n- ")}*`;
   }
 }
 
@@ -344,7 +345,7 @@ class ChatMessageHandler {
   async generateAndUpdateChatTitle(
     chatId: string,
     firstMessage: string
-  ): Promise<string | void> {
+  ): Promise<string> {
     try {
       const { text: title } = await generateText({
         model: openai("gpt-4o-mini"),
