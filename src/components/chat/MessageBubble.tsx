@@ -1,22 +1,24 @@
-import { cn } from '@/lib/utils'
-import { MessageBubbleProps } from '@/types'
-import { Skeleton } from '@/components/ui/skeleton'
-import { StatusIndicator } from './StatusIndicator'
-import { AudioPlayer } from './AudioPlayer'
+import { cn } from "@/lib/utils";
+import { MessageBubbleProps } from "@/types";
+import { Skeleton } from "@/components/ui/skeleton";
+import { StatusIndicator } from "./StatusIndicator";
+import { AudioPlayer } from "./AudioPlayer";
+import Image from "next/image";
+import carnegieAvatarSrc from "@/assets/avatar.jpg";
 
 // This component displays a single message in our chat
 // It handles both user messages and Dale's (assistant) responses
 export function MessageBubble({ message, isLastMessage }: MessageBubbleProps) {
   // Check if this message is from the user or Dale
   // We'll use this to style and position the message differently
-  const isUser = message.role === 'user'
-  
+  const isUser = message.role === "user";
+
   // If this is a status message (like "AI is thinking..."),
   // we show it in a special way using the StatusIndicator
   if (message.status) {
-    return <StatusIndicator status={message.status} />
+    return <StatusIndicator status={message.status} />;
   }
-  
+
   // When Dale is still thinking and generating a response,
   // we show a loading skeleton to indicate something's coming
   if (isLastMessage && !message.content) {
@@ -29,32 +31,43 @@ export function MessageBubble({ message, isLastMessage }: MessageBubbleProps) {
           <Skeleton className="h-16 w-[200px]" />
         </div>
       </div>
-    )
+    );
   }
 
   // This is the main message display
   return (
     // Wrapper that handles message positioning
     // User messages go to the right, Dale's to the left
-    <div className={cn(
-      "flex w-full",
-      isUser ? "justify-end" : "justify-start"
-    )}>
+    <div
+      className={cn("flex w-full gap-1.5", isUser ? "justify-end" : "justify-start")}
+    >
+      {!isUser && (
+        <Image
+          src={carnegieAvatarSrc}
+          alt="Avatar"
+          width={40}
+          height={40}
+          className="rounded-full w-10 h-10 flex-0"
+        />
+      )}
+
       {/* The actual message bubble */}
       {/* User messages are highlighted, Dale's are subtle */}
-      <div className={cn(
-        "rounded-lg px-4 py-2 max-w-[80%]",
-        isUser ? "bg-primary text-primary-foreground" : "bg-muted"
-      )}>
+      <div
+        className={cn(
+          "rounded-lg px-4 py-2 max-w-[80%]",
+          isUser ? "bg-primary text-primary-foreground" : "bg-muted"
+        )}
+      >
         {/* Container for message text and audio player */}
         <div className="flex items-start justify-between gap-2">
           {/* The actual message text */}
           <p className="text-sm whitespace-pre-wrap">{message.content}</p>
-          
+
           {/* Audio player only shows for Dale's messages */}
           {/* We also make sure there's actual content to speak */}
           {!isUser && message.content && (
-            <AudioPlayer 
+            <AudioPlayer
               text={message.content}
               className="mt-1 ml-2 flex-shrink-0"
             />
@@ -65,10 +78,15 @@ export function MessageBubble({ message, isLastMessage }: MessageBubbleProps) {
         {/* we show them below the message */}
         {message.citations && message.citations.length > 0 && (
           <div className="mt-2 space-y-1 border-t border-border/50 pt-2">
-            <p className="text-xs text-muted-foreground font-medium">Sources:</p>
+            <p className="text-xs text-muted-foreground font-medium">
+              Sources:
+            </p>
             {/* List each citation with a bullet point */}
             {message.citations.map((citation, index) => (
-              <div key={index} className="text-xs text-muted-foreground flex items-start gap-1">
+              <div
+                key={index}
+                className="text-xs text-muted-foreground flex items-start gap-1"
+              >
                 <span>•</span>
                 <span>{citation}</span>
               </div>
@@ -77,5 +95,5 @@ export function MessageBubble({ message, isLastMessage }: MessageBubbleProps) {
         )}
       </div>
     </div>
-  )
-} 
+  );
+}
