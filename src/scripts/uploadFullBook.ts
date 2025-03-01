@@ -6,11 +6,12 @@ import path from 'path'
 
 // This represents how we structure each piece of the book's content
 interface ContentChunk {
-  text: string               // The actual text content
+  text: string               // The actual text content  
   metadata: {
-    chapter: string         // Which chapter this is from
-    pageNumber: number      // The page number in the book
-    citation: string        // How we'll cite this in the AI's response
+    part: string           // Which part of the book this is from (4 parts in total)
+    principle: string      // Which principle of the part this is from (12 principles in total)
+    pageNumber: number     // The page number in the book
+    citation: string       // How we'll cite this in the AI's response
   }
 }
 
@@ -32,19 +33,31 @@ async function generateEmbedding(text: string) {
 }
 
 /**
- * Finds chapter headers in the text
- * Example: "Chapter 1: How to Win Friends" -> returns true
+ * Finds part headers in the text
+ * Example: "PART 4: How To Change People..." -> returns "Part 4: How To Change People..."
  */
-function isChapterHeader(line: string): boolean {
-  return line.trim().toLowerCase().startsWith('chapter')
+function isPartHeader(line: string): string | null {
+  const match = line.trim().match(/^PART\s*(\d+):\s*(.+)/i)
+  return match ? `Part ${match[1]}: ${match[2]}` : null
+}
+
+
+/**
+ * Finds principle headers and descriptions in the text
+ * Example: "PRINCIPLE 1: Don't criticize, condemn or complain." 
+ * -> returns { number: "1", text: "Don't criticize, condemn or complain" }
+ */
+function getPrinciple(line: string): { number: string, text: string } | null {
+  const match = line.trim().match(/^PRINCIPLE\s+(\d+):\s*(.+)$/i)
+  return match ? { number: match[1], text: match[2] } : null
 }
 
 /**
  * Finds page numbers in the text
- * Example: "Page 42" -> returns 42
+ * Example: "----- Page 42 -----" -> returns 42
  */
 function getPageNumber(line: string): number | null {
-  const pageMatch = line.match(/^Page (\d+)/)
+  const pageMatch = line.match(/^-----\s*Page\s+(\d+)\s*-----/)
   return pageMatch ? parseInt(pageMatch[1]) : null
 }
 
@@ -53,38 +66,55 @@ function getPageNumber(line: string): number | null {
  * This is necessary because AI models have a limit on how much text they can process at once
  */
 function chunkContent(content: string, chunkSize: number = 500): ContentChunk[] {
-  // This will hold all our chunks of text
   const chunks: ContentChunk[] = []
-  
-  // Split the content into lines so we can process it line by line
   const lines = content.split('\n')
-  
-  // Keep track of what we're currently processing
+
   let currentChunk = ''
-  let currentChapter = 'Introduction'  // Default chapter name
+  let currentPart = 'Introduction'  // Default part
+  let currentPrinciple = ''        // Current principle
   let currentPage = 1
-  
+
   // Go through the book line by line
   for (const line of lines) {
     // Clean up the line (remove extra spaces, weird characters from PDF)
     const cleanLine = line.trim().replace(/\s+/g, ' ')
     if (!cleanLine) continue  // Skip empty lines
 
-    // If we find a chapter header, update our current chapter
-    if (isChapterHeader(cleanLine)) {
-      // If we have content in the current chunk, save it before starting new chapter
+    // Check for part header
+    const partHeader = isPartHeader(cleanLine)
+    if (partHeader) {
       if (currentChunk.trim()) {
         chunks.push({
           text: currentChunk.trim(),
           metadata: {
-            chapter: currentChapter,
+            part: currentPart,
+            principle: currentPrinciple,
             pageNumber: currentPage,
-            citation: `${currentChapter}, Page ${currentPage}`
+            citation: `${currentPart}, Page ${currentPage}`
           }
         })
         currentChunk = ''
       }
-      currentChapter = cleanLine
+      currentPart = partHeader
+      continue
+    }
+
+    // Check for principle
+    const principle = getPrinciple(cleanLine)
+    if (principle) {
+      if (currentChunk.trim()) {
+        chunks.push({
+          text: currentChunk.trim(),
+          metadata: {
+            part: currentPart,
+            principle: currentPrinciple,
+            pageNumber: currentPage,
+            citation: `${currentPart}, Page ${currentPage}`
+          }
+        })
+        currentChunk = ''
+      }
+      currentPrinciple = `Principle ${principle.number}: ${principle.text}`
       continue
     }
 
@@ -98,14 +128,22 @@ function chunkContent(content: string, chunkSize: number = 500): ContentChunk[] 
     // Add this line to our current chunk
     currentChunk += cleanLine + ' '
 
-    // If the chunk is big enough, save it and start a new one
-    if (currentChunk.length >= chunkSize) {
+    // Only create a new chunk if we're past the maximum size AND at a sentence boundary
+    if (currentChunk.length >= chunkSize &&
+      (currentChunk.trim().endsWith('.') ||
+        currentChunk.trim().endsWith('?') ||
+        currentChunk.trim().endsWith('!') ||
+        currentChunk.trim().endsWith(']') ||
+        currentChunk.trim().endsWith('"') ||
+        currentChunk.trim().endsWith('”'))) {
       chunks.push({
         text: currentChunk.trim(),
         metadata: {
-          chapter: currentChapter,
+          part: currentPart,
+          principle: currentPrinciple,
           pageNumber: currentPage,
-          citation: `${currentChapter}, Page ${currentPage}`
+          // citation: `${currentPart}${currentPrinciple ? `, ${currentPrinciple}` : ''}, Page ${currentPage}`
+          citation: `${currentPart}, Page ${currentPage}`
         }
       })
       currentChunk = ''  // Start fresh for next chunk
@@ -117,9 +155,10 @@ function chunkContent(content: string, chunkSize: number = 500): ContentChunk[] 
     chunks.push({
       text: currentChunk.trim(),
       metadata: {
-        chapter: currentChapter,
+        part: currentPart,
+        principle: currentPrinciple,
         pageNumber: currentPage,
-        citation: `${currentChapter}, Page ${currentPage}`
+        citation: `${currentPart}, Page ${currentPage}`
       }
     })
   }
@@ -135,7 +174,7 @@ async function uploadChunkToVectorDB(chunk: ContentChunk, chunkIndex: number) {
   try {
     // Convert the text to an embedding
     const embedding = await generateEmbedding(chunk.text)
-    
+
     // Save to Pinecone with a unique ID
     await pineconeIndex.upsert([{
       id: `chunk-${chunkIndex}`,
@@ -155,10 +194,10 @@ async function uploadChunkToVectorDB(chunk: ContentChunk, chunkIndex: number) {
 
 async function testPineconeContent() {
   console.log('🔍 Testing Pinecone content...')
-  
+
   // Test query about criticism
   const testEmbedding = await generateEmbedding('handling criticism and difficult people')
-  
+
   const results = await pineconeIndex.query({
     vector: testEmbedding,
     topK: 3,
@@ -169,7 +208,8 @@ async function testPineconeContent() {
   results.matches?.forEach((match, i) => {
     console.log(`\nMatch ${i + 1}:`)
     console.log('Text:', match.metadata?.text)
-    console.log('Chapter:', match.metadata?.chapter)
+    console.log('Part:', match.metadata?.part)
+    console.log('Principle:', match.metadata?.principle)
     console.log('Page:', match.metadata?.pageNumber)
   })
 }
@@ -187,6 +227,7 @@ async function main() {
 
     // creates a full path to where the book text is stored on local machine
     const contentPath = path.join(process.cwd(), 'data', 'carnegie-full.txt')
+    // const contentPath = path.join(process.cwd(), 'data', 'carnegie-full.txt')
 
     // opens the book text file and reads it into a variable
     const content = fs.readFileSync(contentPath, 'utf-8')
@@ -202,7 +243,7 @@ async function main() {
     // Step 3: Upload each chunk
     console.log('Uploading chunks to database...')
     console.log('This may take a while, please be patient...')
-    
+
     // chunks variable is an array of objects
     // loop through each object(chunk) and upload it to pinecone using the uploadChunkToVectorDB function
     for (let i = 0; i < chunks.length; i++) {
@@ -214,10 +255,10 @@ async function main() {
     // ask pinecone to give us some stats abt the upload
     const stats = await pineconeIndex.describeIndexStats()
     console.log(`✓ Successfully stored ${stats.totalRecordCount} chunks in Pinecone`)
-    
+
     // prints how many total chunks we stored in pinecone db
     await testPineconeContent()
-    
+
     console.log('All done! The full book content is ready to be used by the AI.')
   } catch (error) {
     console.error('Something went wrong:', error)

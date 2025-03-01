@@ -23,6 +23,7 @@ interface ChatSession {
 
 interface CitationItem {
   text: string;
+  principle: string;
   citation: string;
   relevanceScore: number;
 }
@@ -144,7 +145,9 @@ class PineconeContextSearchService implements IContextSearchService {
     // Process and prepare citations
     const allContextItems = results.matches?.map((match) => ({
       text: match.metadata?.text,
-      citation: `${match.metadata?.chapter}, Page ${match.metadata?.pageNumber}`,
+      principle: match.metadata?.principle,
+      citation: match.metadata?.citation,
+      // citation: `${match.metadata?.chapter}, Page ${match.metadata?.pageNumber}`,
       relevanceScore: match.score,
     }));
 
@@ -242,12 +245,16 @@ class OpenAIResponseGenerationService implements IResponseGenerationService {
       throw error;
     }
   }
+  // (1) Chapter <number>: "<chapter name>" (p. <page number>).
+  // (1) <citation> -> the main source for this should be the citation from the context
 
   // Helper method to generate system prompt - private to encapsulate implementation details
   private generateSystemPrompt(
     context: string,
     contextWithCitations: CitationItem[]
   ): string {
+    const firstPrinciple = contextWithCitations[0].principle.split(':').slice(1).join(':').trim();
+
     return `
     I am Dale Carnegie. 
 
@@ -261,16 +268,16 @@ class OpenAIResponseGenerationService implements IResponseGenerationService {
     ${context}
     ---END CONTEXT---
 
-    2. Format your response EXACTLY like this:
+    2. Format your response in this exact format:
     
     [1-2 sentences answering the question in Dale Carnegie's warm words, and reuse the same style as the context]
 
       • Carnegie Principle: [Include the most relevant principle from the context, if there is one]
       • Try this: [Advice from Dale Carnegie in the form of a one-line actionable command]
-      • Example: [One specific example or story from the context that illustrates the advice]
+      • Example: [One specific example or story from the context that illustrates the advice. Here you can make the text longer if needed. At most 3 lines.]
       
       Sources:
-      (1) Chapter <number>: "<chapter name>" (p. <page number>).
+      - ${contextWithCitations.slice(0, 2).map((c) => c.citation).join("\n- ")}
 
     3. Response Guidelines:
     - Keep your initial response brief, warm and straight to the point
@@ -285,13 +292,12 @@ class OpenAIResponseGenerationService implements IResponseGenerationService {
     5. Example Format:
     The key to influencing others is to genuinely show interest in them first. People care more about their own concerns than yours.
 
-      • Carnegie Principle: Become genuinely interested in other people.
+      • Carnegie Principle: ${firstPrinciple}
       • Try this: Ask thoughtful questions about someone's interests and listen with sincere attention.
       • Example: When I met a botanist at a dinner party, I spent the evening asking about his specialty and listened with fascination. He later told others I was a "most interesting conversationalist" though I barely spoke.
 
       Sources:
-      (1) Chapter 5: "Building Relationships" (p. 89).
-      (2) Chapter 7: "Effective Communication" (p. 112).`;
+      - ${contextWithCitations.slice(0, 2).map((c) => c.citation).join("\n- ")}`;
   }
 }
 
