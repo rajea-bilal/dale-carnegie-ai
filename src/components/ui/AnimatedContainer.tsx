@@ -44,7 +44,7 @@ const AnimatedContainer = ({
 
     return (
         <motion.div
-            className={`w-full mx-auto py-2 flex items-center justify-center text-center overflow-hidden ${className}`}
+            className={`w-full mx-auto py-2 flex items-center justify-center text-center overflow-hidden border-4 border-red-500 ${className}`}
             variants={containerVariants}
             initial="hidden"
             animate={isVisible ? "visible" : "hidden"}

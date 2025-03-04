@@ -64,7 +64,7 @@ const NavigationBar = () => {
 const Cursor = ({ activeIndex }: { activeIndex: number }) => {
   return (
     <motion.div
-      className={cn("absolute z-0 h-full bg-black w-1/2 rounded-lg")}
+      className={cn("absolute z-0 h-full bg-black w-1/2 rounded-lg ")}
       animate={{ left: activeIndex === 0 ? 0 : "50%" }}
     />
   );

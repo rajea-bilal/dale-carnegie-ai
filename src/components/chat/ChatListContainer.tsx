@@ -18,7 +18,7 @@ export function ChatListContainer() {
   const { chats } = useChatContext();
 
   return (
-    <AnimatedCard className="w-full h-full flex flex-col bg-background/80 backdrop-blur-sm border-background/20 shadow-xl">
+    <AnimatedCard className="w-full h-full flex flex-col bg-background/80 backdrop-blur-sm border-background/20 shadow-xl ">
       <ChatListHeader />
       <div className="flex-1 min-h-0">
         <ChatList chats={chats} />

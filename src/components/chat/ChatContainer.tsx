@@ -100,7 +100,7 @@ export function ChatContainer() {
   };
 
   return (
-    <ChatCard className="flex flex-col flex-grow min-h-0 overflow-hidden">
+    <ChatCard className="flex flex-col flex-grow min-h-0 overflow-hidden ">
       <div className="flex flex-col flex-grow min-h-0">
         <MessageList messages={currentChat?.messages} />
         {/* <MessageList messages={messages} /> */}
