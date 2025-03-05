@@ -53,9 +53,9 @@ export default clerkMiddleware(async (auth: ClerkMiddlewareAuth, request: NextRe
         // how amny requests are left
         // when the limit will reset
         // send back the response
-        res.headers.set("X-RateLimit-Limit", limit.toString());
-        res.headers.set("X-RateLimit-Remaining", remaining.toString());
-        res.headers.set("X-RateLimit-Reset", reset.toString());
+        res.headers.append("X-RateLimit-Limit", limit.toString());
+        res.headers.append("X-RateLimit-Remaining", remaining.toString());
+        res.headers.append("X-RateLimit-Reset", reset.toString());
         return res;
     }
 
