@@ -11,6 +11,19 @@ import { useUser, useClerk } from "@clerk/nextjs";
 import toast from "react-hot-toast";
 import isEqual from "lodash/isEqual";
 
+// Displays the current chat conversation
+// Manages the chat state and API interactions
+// Contains:
+// MessageList - scrollable container for messages
+// MessageBubble - individual message bubbles
+// ChatInput - input field for sending new messages
+// AudioPlayer - for playing audio versions of messages
+// StatusIndicator - shows loading states
+// Chat Card - wrapper component for styling chat containers
+// AnimatedMessage - handles animation for messages
+// AudioIcon - UI for audio playback
+// StatusIndicator - Showss typing/loading indicators
+
 const WELCOME_MESSAGE: Message = {
   id: "welcome",
   role: "assistant",

@@ -7,6 +7,13 @@ import { motion } from "motion/react";
 import ChatListHeader from "./ChatListHeader";
 import ChatList from "./ChatList";
 
+// Displays a list of all chat conversations
+// ChatListHeader - displays the title of the current chat
+// ChatList - the scrollable list of chat conversations
+// ChatListItem - Individual chat items in the list
+// ChatListFooter - contains the "New Chat" button
+
+
 interface Chat {
   id: string;
   title: string;

@@ -10,6 +10,11 @@ import { useUser, useClerk } from "@clerk/nextjs";
 import toast from "react-hot-toast";
 import { ChatData } from "@/types";
 
+
+// ChatContext - provides chat data and functions to all components
+// manages the list of chats and the currently selected chat
+// handles operations like creating, selecting and deleting chats
+
 interface ChatContextType {
   chats: ChatData[];
   currentChat: ChatData | null;
